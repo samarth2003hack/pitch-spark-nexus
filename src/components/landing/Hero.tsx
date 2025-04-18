@@ -1,7 +1,7 @@
-
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ShowcaseIdeaButton } from "@/components/shared/ShowcaseIdeaButton";
 
 export function Hero() {
   return (
@@ -19,12 +19,7 @@ export function Hero() {
               LaunchPad connects innovative founders with expert mentors to refine ideas and accelerate startup success.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/signup">
-                <Button className="bg-launchpad-blue hover:bg-launchpad-blue-dark text-lg px-6 py-6">
-                  Get Started
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
+              <ShowcaseIdeaButton />
               <Link to="/about">
                 <Button variant="outline" className="text-lg px-6 py-6">
                   Learn More

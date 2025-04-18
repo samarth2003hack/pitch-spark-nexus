@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter } from 'lucide-react';
@@ -20,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ShowcaseIdeaButton } from '@/components/shared/ShowcaseIdeaButton';
 
 // Mock data for pitches (replace with real data later)
 const mockPitches = [
@@ -73,12 +73,15 @@ const PitchesPage = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="flex flex-col space-y-8">
-        {/* Header Section */}
-        <div className="flex flex-col space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight">Explore Pitches</h1>
-          <p className="text-muted-foreground">
-            Discover innovative startup ideas and provide valuable feedback
-          </p>
+        {/* Header Section with added CTA */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight">Explore Pitches</h1>
+            <p className="text-muted-foreground">
+              Discover innovative startup ideas and provide valuable feedback
+            </p>
+          </div>
+          <ShowcaseIdeaButton />
         </div>
 
         {/* Search and Filter Section */}
