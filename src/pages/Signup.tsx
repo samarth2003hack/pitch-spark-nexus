@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Eye, EyeOff, ArrowRight, Github, Linkedin } from "lucide-react";
+import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { GoogleIcon } from "@/components/icons/GoogleIcon";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,6 +29,11 @@ const Signup = () => {
       setIsLoading(false);
       // In a real app, you would handle account creation here
     }, 1500);
+  };
+
+  const handleGoogleSignup = () => {
+    console.log("Google signup initiated");
+    // In a real app, you would implement Google OAuth signup here
   };
 
   return (
@@ -169,26 +175,15 @@ const Signup = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            className="h-12"
-            onClick={() => console.log("Github signup")}
-          >
-            <Github className="mr-2 h-5 w-5" />
-            Github
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="h-12"
-            onClick={() => console.log("LinkedIn signup")}
-          >
-            <Linkedin className="mr-2 h-5 w-5" />
-            LinkedIn
-          </Button>
-        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full h-12 flex items-center justify-center"
+          onClick={handleGoogleSignup}
+        >
+          <GoogleIcon className="mr-2 h-5 w-5" />
+          Continue with Google
+        </Button>
       </form>
     </AuthLayout>
   );

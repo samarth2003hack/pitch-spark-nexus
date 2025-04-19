@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "react-router-dom";
-import { Eye, EyeOff, ArrowRight, Github, Linkedin } from "lucide-react";
+import { Eye, EyeOff, ArrowRight } from "lucide-react";
+import { GoogleIcon } from "@/components/icons/GoogleIcon";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,6 +26,11 @@ const Login = () => {
       setIsLoading(false);
       // In a real app, you would handle authentication here
     }, 1500);
+  };
+
+  const handleGoogleLogin = () => {
+    console.log("Google login initiated");
+    // In a real app, you would implement Google OAuth login here
   };
 
   return (
@@ -136,26 +142,15 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            className="h-12"
-            onClick={() => console.log("Github login")}
-          >
-            <Github className="mr-2 h-5 w-5" />
-            Github
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="h-12"
-            onClick={() => console.log("LinkedIn login")}
-          >
-            <Linkedin className="mr-2 h-5 w-5" />
-            LinkedIn
-          </Button>
-        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full h-12 flex items-center justify-center"
+          onClick={handleGoogleLogin}
+        >
+          <GoogleIcon className="mr-2 h-5 w-5" />
+          Continue with Google
+        </Button>
       </form>
     </AuthLayout>
   );
