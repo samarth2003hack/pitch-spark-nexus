@@ -14,21 +14,25 @@ import {
 
 // Mock auth state - Replace with actual auth logic when implemented
 const useMockAuth = () => {
-  // In a real app, this would come from your auth provider
   return {
     isAuthenticated: localStorage.getItem("isAuthenticated") === "true",
-    userRole: localStorage.getItem("userRole") || "", // "founder" or "mentor"
+    userRole: localStorage.getItem("userRole") || "",
     user: {
-      name: localStorage.getItem("userRole") === "founder" ? "Sarah Johnson" : "Michael Chen",
-      avatar: localStorage.getItem("userRole") === "founder" 
-        ? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100"
-        : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100",
+      name:
+        localStorage.getItem("userRole") === "founder"
+          ? "Sarah Johnson"
+          : "Michael Chen",
+      avatar:
+        localStorage.getItem("userRole") === "founder"
+          ? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100"
+          : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100",
       initials: localStorage.getItem("userRole") === "founder" ? "SJ" : "MC"
     },
     login: (role: string) => {
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userRole", role);
-      window.location.href = role === "founder" ? "/founder-dashboard" : "/mentor-dashboard";
+      window.location.href =
+        role === "founder" ? "/founder-dashboard" : "/mentor-dashboard";
     },
     logout: () => {
       localStorage.removeItem("isAuthenticated");
@@ -43,10 +47,6 @@ export function Navbar() {
   const auth = useMockAuth();
   const location = useLocation();
 
-  // Don't render navbar on home page
-  if (location.pathname === "/") {
-    return null;
-  }
 
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm">
@@ -60,33 +60,26 @@ export function Navbar() {
               <span className="font-bold text-xl text-launchpad-blue-dark">LaunchPad</span>
             </Link>
           </div>
-          
+
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden lg:flex items-center space-x-6">
             <Link to="/" className="font-medium text-gray-800 hover:text-launchpad-blue transition-colors">Home</Link>
             <Link to="/startups" className="font-medium text-gray-800 hover:text-launchpad-blue transition-colors">Startups</Link>
             <Link to="/pitches" className="font-medium text-gray-800 hover:text-launchpad-blue transition-colors">Pitches</Link>
             <Link to="/about" className="font-medium text-gray-800 hover:text-launchpad-blue transition-colors">About</Link>
-            
+
             {auth.isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage
-                        src={auth.user.avatar}
-                        alt={auth.user.name}
-                      />
-                      <AvatarFallback>
-                        {auth.user.initials}
-                      </AvatarFallback>
+                      <AvatarImage src={auth.user.avatar} alt={auth.user.name} />
+                      <AvatarFallback>{auth.user.initials}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>
-                    {auth.user.name}
-                  </DropdownMenuLabel>
+                  <DropdownMenuLabel>{auth.user.name}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link to={auth.userRole === "founder" ? "/founder-dashboard" : "/mentor-dashboard"}>
@@ -100,13 +93,11 @@ export function Navbar() {
                   </DropdownMenuItem>
                   {auth.userRole === "founder" && (
                     <DropdownMenuItem asChild>
-                      <Link to="/your-startup">
-                        Your Startup
-                      </Link>
+                      <Link to="/your-startup">Your Startup</Link>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => auth.logout()} className="text-red-500 focus:text-red-500">
+                  <DropdownMenuItem onClick={auth.logout} className="text-red-500 focus:text-red-500">
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -122,7 +113,7 @@ export function Navbar() {
               </>
             )}
           </div>
-          
+
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
@@ -135,75 +126,42 @@ export function Navbar() {
           </div>
         </div>
       </div>
-      
-      {/* Mobile menu */}
+
+      {/* Mobile nav */}
       {isOpen && (
         <div className="md:hidden bg-white border-t">
           <div className="container mx-auto px-4 pt-2 pb-3 space-y-1">
-            <Link 
-              to="/"
-              className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light"
-              onClick={() => setIsOpen(false)}
-            >
+            <Link to="/" className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light" onClick={() => setIsOpen(false)}>
               Home
             </Link>
-            <Link 
-              to="/startups"
-              className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light"
-              onClick={() => setIsOpen(false)}
-            >
+            <Link to="/startups" className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light" onClick={() => setIsOpen(false)}>
               Startups
             </Link>
-            <Link 
-              to="/pitches"
-              className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light"
-              onClick={() => setIsOpen(false)}
-            >
+            <Link to="/pitches" className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light" onClick={() => setIsOpen(false)}>
               Pitches
             </Link>
-            <Link 
-              to="/about"
-              className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light"
-              onClick={() => setIsOpen(false)}
-            >
+            <Link to="/about" className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light" onClick={() => setIsOpen(false)}>
               About
             </Link>
-            
+
             {auth.isAuthenticated ? (
               <div className="pt-2 border-t mt-2">
                 <div className="flex items-center px-3 py-2">
                   <Avatar className="h-8 w-8 mr-2">
-                    <AvatarImage
-                      src={auth.user.avatar}
-                      alt={auth.user.name}
-                    />
-                    <AvatarFallback>
-                      {auth.user.initials}
-                    </AvatarFallback>
+                    <AvatarImage src={auth.user.avatar} alt={auth.user.name} />
+                    <AvatarFallback>{auth.user.initials}</AvatarFallback>
                   </Avatar>
                   <span className="font-medium">{auth.user.name}</span>
                 </div>
-                
-                <Link 
-                  to={auth.userRole === "founder" ? "/founder-dashboard" : "/mentor-dashboard"}
-                  className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light"
-                  onClick={() => setIsOpen(false)}
-                >
+
+                <Link to={auth.userRole === "founder" ? "/founder-dashboard" : "/mentor-dashboard"} className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light" onClick={() => setIsOpen(false)}>
                   Dashboard
                 </Link>
-                <Link 
-                  to={auth.userRole === "founder" ? "/founder-profile" : "/mentor-profile"}
-                  className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light"
-                  onClick={() => setIsOpen(false)}
-                >
+                <Link to={auth.userRole === "founder" ? "/founder-profile" : "/mentor-profile"} className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light" onClick={() => setIsOpen(false)}>
                   Profile
                 </Link>
                 {auth.userRole === "founder" && (
-                  <Link 
-                    to="/your-startup"
-                    className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light"
-                    onClick={() => setIsOpen(false)}
-                  >
+                  <Link to="/your-startup" className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light" onClick={() => setIsOpen(false)}>
                     Your Startup
                   </Link>
                 )}

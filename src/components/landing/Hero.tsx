@@ -2,10 +2,14 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ShowcaseIdeaButton } from "@/components/shared/ShowcaseIdeaButton";
+import { Navbar } from "../Navbar";
 
 export function Hero() {
   return (
+    <>
+    
     <section className="relative overflow-hidden">
+    <Navbar></Navbar>
       {/* Background with gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-launchpad-blue/10 to-launchpad-blue-dark/10 z-0"></div>
       
@@ -57,5 +61,7 @@ export function Hero() {
         </div>
       </div>
     </section>
+    </>
+    
   );
 }

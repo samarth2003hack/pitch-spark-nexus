@@ -31,6 +31,12 @@ export default function StartupDetails() {
   const { id } = useParams();
 
   return (
+
+
+    <>
+    
+    <Navbar>
+    </Navbar>
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <Card className="mb-8">
@@ -74,5 +80,9 @@ export default function StartupDetails() {
         </div>
       </div>
     </div>
+
+
+    </>
+   
   );
 }

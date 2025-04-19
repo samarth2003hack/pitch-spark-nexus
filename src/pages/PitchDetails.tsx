@@ -286,6 +286,9 @@ const PitchDetails = () => {
   };
 
   return (
+    <>
+    <Navbar></Navbar>
+    
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow bg-gray-50 pt-6 pb-12">
@@ -632,6 +635,9 @@ const PitchDetails = () => {
       </main>
       <Footer />
     </div>
+    
+    </>
+ 
   );
 };
 

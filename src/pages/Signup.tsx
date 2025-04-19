@@ -10,6 +10,7 @@ import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { toast } from "@/hooks/use-toast";
+import { Navbar } from "@/components/Navbar";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -75,7 +76,10 @@ const Signup = () => {
   };
 
   return (
-    <AuthLayout
+    <>
+      
+      <Navbar></Navbar>
+      <AuthLayout
       title="Create an account"
       subtitle="Join LaunchPad to connect with mentors and founders"
       authType="signup"
@@ -232,6 +236,9 @@ const Signup = () => {
         </p>
       </form>
     </AuthLayout>
+    
+    </>
+  
   );
 };
 

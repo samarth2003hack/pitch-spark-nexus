@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ShowcaseIdeaButton } from '@/components/shared/ShowcaseIdeaButton';
+import { Navbar } from '@/components/Navbar';
 
 // Mock data for pitches (replace with real data later)
 const mockPitches = [
@@ -72,6 +73,10 @@ const PitchesPage = () => {
     });
 
   return (
+    <>
+    
+      <Navbar></Navbar>
+
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="flex flex-col space-y-8">
         {/* Header Section with added CTA */}
@@ -151,6 +156,8 @@ const PitchesPage = () => {
         </div>
       </div>
     </div>
+    </>
+    
   );
 };
 

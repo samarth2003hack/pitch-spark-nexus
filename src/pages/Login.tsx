@@ -9,6 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { toast } from "@/hooks/use-toast";
+import { Navbar } from "@/components/Navbar";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -79,6 +80,8 @@ const Login = () => {
   };
 
   return (
+    <>
+      <Navbar></Navbar>
     <AuthLayout
       title="Welcome back"
       subtitle="Enter your credentials to access your account"
@@ -206,6 +209,9 @@ const Login = () => {
         </p>
       </form>
     </AuthLayout>
+    
+    </>
+    
   );
 };
 

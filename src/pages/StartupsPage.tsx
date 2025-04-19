@@ -3,6 +3,7 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { Navbar } from "@/components/Navbar";
 
 // Mock data for startups - in a real app, this would come from your backend
 const mockStartups = [
@@ -24,6 +25,10 @@ const mockStartups = [
 
 export default function StartupsPage() {
   return (
+
+    <>
+    <Navbar></Navbar>
+    
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Featured Startups</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -57,5 +62,7 @@ export default function StartupsPage() {
         ))}
       </div>
     </div>
+    </>
+  
   );
 }

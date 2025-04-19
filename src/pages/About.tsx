@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 export default function About() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      <Navbar></Navbar>
       
       <main className="flex-grow">
         {/* Hero Section */}

@@ -10,6 +10,7 @@ import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { DollarSign, CreditCard, HandHeart } from "lucide-react";
 import { useParams } from "react-router-dom";
+import { Navbar } from "@/components/Navbar";
 
 // Mock data for the startup
 const startupData = {
@@ -94,6 +95,8 @@ const SupportUs = () => {
   const progressPercentage = Math.min(Math.round((startupData.raised / startupData.goal) * 100), 100);
 
   return (
+    <>
+    <Navbar></Navbar>
     <MainLayout>
       <div className="container mx-auto py-12 px-4 md:px-6">
         <div className="max-w-5xl mx-auto">
@@ -335,6 +338,10 @@ const SupportUs = () => {
         </div>
       </div>
     </MainLayout>
+    
+    
+    </>
+   
   );
 };
 
