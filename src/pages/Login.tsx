@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
+import { toast } from "@/hooks/use-toast";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,14 +25,57 @@ const Login = () => {
     // Simulate API call for demonstration purposes
     setTimeout(() => {
       console.log("Login attempt", { email, password, rememberMe });
+      
+      if (email.includes("founder")) {
+        // Mock founder login
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("userRole", "founder");
+        toast({
+          title: "Login successful",
+          description: "Welcome back, founder!",
+        });
+        navigate("/founder-dashboard");
+      } else if (email.includes("mentor")) {
+        // Mock mentor login
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("userRole", "mentor");
+        toast({
+          title: "Login successful",
+          description: "Welcome back, mentor!",
+        });
+        navigate("/mentor-dashboard");
+      } else {
+        // Default to founder for demo
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("userRole", "founder");
+        toast({
+          title: "Login successful",
+          description: "Welcome back!",
+        });
+        navigate("/founder-dashboard");
+      }
+      
       setIsLoading(false);
-      // In a real app, you would handle authentication here
     }, 1500);
   };
 
   const handleGoogleLogin = () => {
-    console.log("Google login initiated");
-    // In a real app, you would implement Google OAuth login here
+    setIsLoading(true);
+    
+    // Simulate Google login for demonstration
+    setTimeout(() => {
+      // Default to founder for demo
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("userRole", "founder");
+      
+      toast({
+        title: "Google login successful",
+        description: "Welcome to LaunchPad!",
+      });
+      
+      navigate("/founder-dashboard");
+      setIsLoading(false);
+    }, 1500);
   };
 
   return (
@@ -147,10 +192,18 @@ const Login = () => {
           variant="outline"
           className="w-full h-12 flex items-center justify-center"
           onClick={handleGoogleLogin}
+          disabled={isLoading}
         >
           <GoogleIcon className="mr-2 h-5 w-5" />
           Continue with Google
         </Button>
+
+        <p className="text-center text-sm text-gray-600 mt-6">
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-launchpad-blue hover:underline font-medium">
+            Sign up
+          </Link>
+        </p>
       </form>
     </AuthLayout>
   );

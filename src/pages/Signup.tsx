@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
+import { toast } from "@/hooks/use-toast";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -26,14 +28,50 @@ const Signup = () => {
     // Simulate API call for demonstration purposes
     setTimeout(() => {
       console.log("Signup attempt", { name, email, password, role, agreeTerms });
+      
+      // Set auth state
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("userRole", role);
+      
+      toast({
+        title: "Account created successfully",
+        description: "Welcome to LaunchPad!",
+      });
+      
+      // Redirect based on role
+      if (role === "founder") {
+        navigate("/founder-dashboard");
+      } else {
+        navigate("/mentor-dashboard");
+      }
+      
       setIsLoading(false);
-      // In a real app, you would handle account creation here
     }, 1500);
   };
 
   const handleGoogleSignup = () => {
-    console.log("Google signup initiated");
-    // In a real app, you would implement Google OAuth signup here
+    setIsLoading(true);
+    
+    // Simulate Google signup
+    setTimeout(() => {
+      // Set auth state - default to selected role
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("userRole", role);
+      
+      toast({
+        title: "Google sign up successful",
+        description: "Welcome to LaunchPad!",
+      });
+      
+      // Redirect based on role
+      if (role === "founder") {
+        navigate("/founder-dashboard");
+      } else {
+        navigate("/mentor-dashboard");
+      }
+      
+      setIsLoading(false);
+    }, 1500);
   };
 
   return (
@@ -180,10 +218,18 @@ const Signup = () => {
           variant="outline"
           className="w-full h-12 flex items-center justify-center"
           onClick={handleGoogleSignup}
+          disabled={isLoading}
         >
           <GoogleIcon className="mr-2 h-5 w-5" />
           Continue with Google
         </Button>
+
+        <p className="text-center text-sm text-gray-600 mt-6">
+          Already have an account?{" "}
+          <Link to="/login" className="text-launchpad-blue hover:underline font-medium">
+            Log in
+          </Link>
+        </p>
       </form>
     </AuthLayout>
   );
