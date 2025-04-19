@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { X } from "lucide-react";
 
 const categories = [
   "SaaS",
@@ -25,6 +25,7 @@ const categories = [
 export default function CreatePitch() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -36,6 +37,10 @@ export default function CreatePitch() {
     competitiveAdvantage: "",
     funding: "",
   });
+  const [video, setVideo] = useState<File | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [videoPreview, setVideoPreview] = useState<string>("");
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -46,13 +51,106 @@ export default function CreatePitch() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('video/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a video file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Video must be less than 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setVideo(file);
+    const url = URL.createObjectURL(file);
+    setVideoPreview(url);
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+
+    // Validate number of photos
+    if (photos.length + files.length > 3) {
+      toast({
+        title: "Too many photos",
+        description: "You can only upload up to 3 photos",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file types and sizes
+    const validFiles = files.filter(file => {
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload image files only",
+          variant: "destructive",
+        });
+        return false;
+      }
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit per photo
+        toast({
+          title: "File too large",
+          description: "Each photo must be less than 5MB",
+          variant: "destructive",
+        });
+        return false;
+      }
+      return true;
+    });
+
+    setPhotos(prev => [...prev, ...validFiles]);
+    const newPreviews = validFiles.map(file => URL.createObjectURL(file));
+    setPhotoPreviews(prev => [...prev, ...newPreviews]);
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos(prev => prev.filter((_, i) => i !== index));
+    setPhotoPreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeVideo = () => {
+    setVideo(null);
+    setVideoPreview("");
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Create FormData object for file upload
+    const formDataToSubmit = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      formDataToSubmit.append(key, value);
+    });
+
+    if (video) {
+      formDataToSubmit.append('video', video);
+    }
+    photos.forEach((photo, index) => {
+      formDataToSubmit.append(`photo${index}`, photo);
+    });
+
     // Simulate API call
     setTimeout(() => {
       console.log("Pitch submitted:", formData);
+      console.log("Video:", video);
+      console.log("Photos:", photos);
       toast({
         title: "Pitch submitted successfully!",
         description: "Our mentors will review your idea soon.",
@@ -204,6 +302,75 @@ export default function CreatePitch() {
                       onChange={handleChange}
                       placeholder="How much funding do you need and what will you use it for?"
                     />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t">
+                <h3 className="text-lg font-medium mb-4">Media</h3>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="video">Pitch Video (Max 10MB)</Label>
+                    <Input
+                      id="video"
+                      type="file"
+                      accept="video/*"
+                      onChange={handleVideoChange}
+                      className="mt-1"
+                    />
+                    {videoPreview && (
+                      <div className="mt-2 relative">
+                        <video
+                          ref={videoRef}
+                          src={videoPreview}
+                          controls
+                          className="w-full max-h-[300px] rounded-lg"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2"
+                          onClick={removeVideo}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="photos">Photos (Max 3, 5MB each)</Label>
+                    <Input
+                      id="photos"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handlePhotoChange}
+                      className="mt-1"
+                    />
+                    {photoPreviews.length > 0 && (
+                      <div className="mt-2 grid grid-cols-3 gap-2">
+                        {photoPreviews.map((preview, index) => (
+                          <div key={index} className="relative">
+                            <img
+                              src={preview}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-32 object-cover rounded-lg"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute top-1 right-1"
+                              onClick={() => removePhoto(index)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

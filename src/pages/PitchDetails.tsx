@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
@@ -46,6 +45,7 @@ const FeedbackItem = ({
   avatarUrl: string;
 }) => {
   return (
+
     <div className="border-b pb-6 mb-6 last:border-0">
       <div className="flex items-start space-x-4">
         <Avatar className="h-10 w-10">
@@ -60,23 +60,22 @@ const FeedbackItem = ({
             </div>
             <span className="text-xs text-gray-500">{date}</span>
           </div>
-          
+
           <div className="flex items-center mb-3">
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
                 size={16}
-                className={`${
-                  i < rating
-                    ? "text-yellow-400 fill-yellow-400"
-                    : "text-gray-300"
-                }`}
+                className={`${i < rating
+                  ? "text-yellow-400 fill-yellow-400"
+                  : "text-gray-300"
+                  }`}
               />
             ))}
           </div>
-          
+
           <p className="text-gray-700">{comment}</p>
-          
+
           <div className="flex items-center mt-3 space-x-4">
             <button className="flex items-center text-xs text-gray-500 hover:text-launchpad-blue">
               <ThumbsUp size={14} className="mr-1" />
@@ -276,6 +275,14 @@ const PitchDetails = () => {
         avatarUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100",
       },
     ],
+    media: {
+      video: "https://example.com/pitch-video.mp4",
+      photos: [
+        "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+        "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
+        "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
+      ],
+    },
   };
 
   // Function to handle feedback submission
@@ -286,245 +293,166 @@ const PitchDetails = () => {
   };
 
   return (
-    <>
-    <Navbar></Navbar>
-    
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="flex-grow bg-gray-50 pt-6 pb-12">
-        <div className="container mx-auto px-4">
-          {/* Back button */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
           <div className="mb-6">
             <Link
               to="/pitches"
-              className="inline-flex items-center text-gray-600 hover:text-launchpad-blue"
+              className="inline-flex items-center text-sm text-gray-600 hover:text-launchpad-blue"
             >
-              <ArrowLeft size={16} className="mr-2" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Pitches
             </Link>
           </div>
 
-          {/* Pitch header */}
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 md:mb-0">
-                {pitchData.title}
-              </h1>
-              <Badge 
-                className="self-start md:self-auto"
-                variant="outline" 
-              >
-                {pitchData.category}
-              </Badge>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-4 mb-6 text-sm text-gray-500">
-              <div className="flex items-center">
-                <Avatar className="h-8 w-8 mr-2">
-                  <AvatarImage
-                    src={pitchData.founder.avatarUrl}
-                    alt={pitchData.founder.name}
-                  />
-                  <AvatarFallback>
-                    {pitchData.founder.name.substring(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-                <span>
-                  {pitchData.founder.name} • {pitchData.founder.role}
-                </span>
-              </div>
-              <div>
-                <FileText size={16} className="inline mr-1" />
-                Posted on {pitchData.date}
-              </div>
-              <div className="flex items-center">
-                <Star
-                  size={16}
-                  className="text-yellow-400 fill-yellow-400 mr-1"
-                />
-                <span>4.7/5 (24 reviews)</span>
-              </div>
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex flex-wrap gap-3">
-              <Button className="bg-launchpad-blue hover:bg-launchpad-blue-dark">
-                <MessageSquare size={16} className="mr-2" />
-                Provide Feedback
-              </Button>
-              <Button variant="outline">
-                <Heart size={16} className="mr-2" />
-                Save
-              </Button>
-              <Button variant="outline">
-                <Share2 size={16} className="mr-2" />
-                Share
-              </Button>
-              {pitchData.pitchDeck && (
-                <Button variant="outline">
-                  <Download size={16} className="mr-2" />
-                  Download Deck
-                </Button>
-              )}
-              {pitchData.website && (
-                <a href={pitchData.website} target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline">
-                    <ExternalLink size={16} className="mr-2" />
-                    Visit Website
-                  </Button>
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* Pitch content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                <Tabs defaultValue="pitch">
-                  <TabsList className="mb-6">
-                    <TabsTrigger value="pitch">Pitch Details</TabsTrigger>
-                    <TabsTrigger value="feedback">Feedback ({pitchData.feedback.length})</TabsTrigger>
-                    <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="pitch">
-                    <div className="space-y-6">
-                      <div>
-                        <h2 className="text-xl font-semibold mb-3">Description</h2>
-                        <p className="text-gray-700">{pitchData.description}</p>
-                      </div>
-
-                      <div>
-                        <h2 className="text-xl font-semibold mb-3">Problem</h2>
-                        <p className="text-gray-700">{pitchData.problem}</p>
-                      </div>
-
-                      <div>
-                        <h2 className="text-xl font-semibold mb-3">Solution</h2>
-                        <p className="text-gray-700">{pitchData.solution}</p>
-                      </div>
-
-                      <div>
-                        <h2 className="text-xl font-semibold mb-3">Business Model</h2>
-                        <p className="text-gray-700">{pitchData.businessModel}</p>
-                      </div>
-
-                      <div>
-                        <h2 className="text-xl font-semibold mb-3">Market Opportunity</h2>
-                        <p className="text-gray-700">{pitchData.market}</p>
-                      </div>
-
-                      <div>
-                        <h2 className="text-xl font-semibold mb-3">Traction</h2>
-                        <p className="text-gray-700">{pitchData.traction}</p>
-                      </div>
-
-                      <div>
-                        <h2 className="text-xl font-semibold mb-3">Team</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {pitchData.team.map((member, index) => (
-                            <div key={index} className="bg-gray-50 p-4 rounded-lg">
-                              <p className="font-medium">{member.name}</p>
-                              <p className="text-sm text-gray-500 mb-2">{member.role}</p>
-                              <p className="text-sm">{member.bio}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <h2 className="text-xl font-semibold mb-3">Funding</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-500 mb-1">Funding Status</p>
-                            <p className="font-medium">{pitchData.fundingStatus}</p>
-                          </div>
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-500 mb-1">Ask Amount</p>
-                            <p className="font-medium">{pitchData.askAmount}</p>
-                          </div>
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-500 mb-1">Use of Funds</p>
-                            <p className="font-medium">{pitchData.useOfFunds}</p>
-                          </div>
-                        </div>
-                      </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-2xl mb-2">
+                        {pitchData.title}
+                      </CardTitle>
+                      <CardDescription>
+                        <Badge variant="outline" className="mr-2">
+                          {pitchData.category}
+                        </Badge>
+                        <span className="text-gray-500">
+                          Posted on {pitchData.date}
+                        </span>
+                      </CardDescription>
                     </div>
-                  </TabsContent>
+                    <div className="flex space-x-2">
+                      <Button variant="outline" size="icon">
+                        <Share2 className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="icon">
+                        <Heart className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="prose max-w-none">
+                    <p className="text-gray-700">{pitchData.description}</p>
+                  </div>
+                </CardContent>
+              </Card>
 
-                  <TabsContent value="feedback">
-                    <div className="space-y-6">
-                      <div className="bg-launchpad-blue/5 rounded-lg p-6 mb-6">
-                        <h2 className="text-xl font-semibold mb-4">
-                          Provide Your Feedback
-                        </h2>
-                        <div className="mb-4">
-                          <p className="mb-2 font-medium">Rating</p>
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <button
-                                key={star}
-                                type="button"
-                                onClick={() => setRating(star)}
-                                className="focus:outline-none"
-                              >
-                                <Star
-                                  size={24}
-                                  className={`${
-                                    star <= rating
-                                      ? "text-yellow-400 fill-yellow-400"
-                                      : "text-gray-300"
-                                  }`}
-                                />
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                        <Textarea
-                          placeholder="Share your thoughts, suggestions, and feedback about this pitch..."
-                          value={feedbackText}
-                          onChange={(e) => setFeedbackText(e.target.value)}
-                          className="mb-4 h-32"
-                        />
-                        <Button 
-                          onClick={handleSubmitFeedback}
-                          className="bg-launchpad-blue hover:bg-launchpad-blue-dark"
-                          disabled={!feedbackText || rating === 0}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pitch Media</CardTitle>
+                  <CardDescription>
+                    Video presentation and supporting images
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {pitchData.media.video && (
+                      <div className="aspect-video w-full">
+                        <video
+                          controls
+                          className="w-full h-full rounded-lg"
+                          src={pitchData.media.video}
                         >
-                          Submit Feedback
-                        </Button>
+                          Your browser does not support the video tag.
+                        </video>
                       </div>
+                    )}
 
-                      <div>
-                        <h2 className="text-xl font-semibold mb-4">
-                          Mentor Feedback ({pitchData.feedback.length})
-                        </h2>
-                        <div className="space-y-6">
-                          {pitchData.feedback.map((feedback) => (
-                            <FeedbackItem
-                              key={feedback.id}
-                              name={feedback.name}
-                              role={feedback.role}
-                              date={feedback.date}
-                              rating={feedback.rating}
-                              comment={feedback.comment}
-                              avatarUrl={feedback.avatarUrl}
+                    {pitchData.media.photos && pitchData.media.photos.length > 0 && (
+                      <div className="grid grid-cols-3 gap-4">
+                        {pitchData.media.photos.map((photo, index) => (
+                          <div
+                            key={index}
+                            className="aspect-square rounded-lg overflow-hidden"
+                          >
+                            <img
+                              src={photo}
+                              alt={`Pitch image ${index + 1}`}
+                              className="w-full h-full object-cover"
                             />
-                          ))}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Problem & Solution</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-medium mb-2">Problem</h3>
+                      <p className="text-gray-700">{pitchData.problem}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-medium mb-2">Solution</h3>
+                      <p className="text-gray-700">{pitchData.solution}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pitch Details</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div>
+                      <h2 className="text-xl font-semibold mb-3">Business Model</h2>
+                      <p className="text-gray-700">{pitchData.businessModel}</p>
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold mb-3">Market Opportunity</h2>
+                      <p className="text-gray-700">{pitchData.market}</p>
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold mb-3">Traction</h2>
+                      <p className="text-gray-700">{pitchData.traction}</p>
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold mb-3">Team</h2>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {pitchData.team.map((member, index) => (
+                          <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                            <p className="font-medium">{member.name}</p>
+                            <p className="text-sm text-gray-500 mb-2">{member.role}</p>
+                            <p className="text-sm">{member.bio}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold mb-3">Funding</h2>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <p className="text-sm text-gray-500 mb-1">Funding Status</p>
+                          <p className="font-medium">{pitchData.fundingStatus}</p>
+                        </div>
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <p className="text-sm text-gray-500 mb-1">Ask Amount</p>
+                          <p className="font-medium">{pitchData.askAmount}</p>
+                        </div>
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <p className="text-sm text-gray-500 mb-1">Use of Funds</p>
+                          <p className="font-medium">{pitchData.useOfFunds}</p>
                         </div>
                       </div>
                     </div>
-                  </TabsContent>
-
-                  <TabsContent value="analytics">
-                    <PitchAnalytics />
-                  </TabsContent>
-                </Tabs>
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Sidebar */}
             <div className="space-y-6">
               <Card>
                 <CardHeader>
@@ -549,7 +477,7 @@ const PitchDetails = () => {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="flex space-x-2 mt-4">
                     <Button variant="outline" className="flex-1">
                       Message
@@ -632,12 +560,9 @@ const PitchDetails = () => {
             </div>
           </div>
         </div>
-      </main>
+      </div>
       <Footer />
     </div>
-    
-    </>
- 
   );
 };
 
