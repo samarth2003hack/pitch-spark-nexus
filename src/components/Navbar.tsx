@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -44,6 +43,11 @@ export function Navbar() {
   const auth = useMockAuth();
   const location = useLocation();
 
+  // Don't render navbar on home page
+  if (location.pathname === "/") {
+    return null;
+  }
+
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm">
       <div className="container mx-auto px-4 md:px-6">
@@ -60,9 +64,9 @@ export function Navbar() {
           {/* Desktop nav */}
           <div className="hidden md:flex items-center space-x-6">
             <Link to="/" className="font-medium text-gray-800 hover:text-launchpad-blue transition-colors">Home</Link>
+            <Link to="/startups" className="font-medium text-gray-800 hover:text-launchpad-blue transition-colors">Startups</Link>
             <Link to="/pitches" className="font-medium text-gray-800 hover:text-launchpad-blue transition-colors">Pitches</Link>
             <Link to="/about" className="font-medium text-gray-800 hover:text-launchpad-blue transition-colors">About</Link>
-            <Link to="/support-us" className="font-medium text-gray-800 hover:text-launchpad-blue transition-colors">Support Us</Link>
             
             {auth.isAuthenticated ? (
               <DropdownMenu>
@@ -144,6 +148,13 @@ export function Navbar() {
               Home
             </Link>
             <Link 
+              to="/startups"
+              className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light"
+              onClick={() => setIsOpen(false)}
+            >
+              Startups
+            </Link>
+            <Link 
               to="/pitches"
               className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light"
               onClick={() => setIsOpen(false)}
@@ -156,13 +167,6 @@ export function Navbar() {
               onClick={() => setIsOpen(false)}
             >
               About
-            </Link>
-            <Link 
-              to="/support-us"
-              className="block py-2 px-3 rounded-md hover:bg-launchpad-gray-light"
-              onClick={() => setIsOpen(false)}
-            >
-              Support Us
             </Link>
             
             {auth.isAuthenticated ? (

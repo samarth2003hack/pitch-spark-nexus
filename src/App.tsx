@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +19,8 @@ import NewPitch from "./pages/NewPitch";
 import FounderProfile from "./pages/FounderProfile";
 import MentorProfile from "./pages/MentorProfile";
 import SupportUs from "./pages/SupportUs";
+import StartupsPage from "./pages/StartupsPage";
+import StartupDetails from "./pages/StartupDetails";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,8 @@ const App = () => (
               <Route path="/about" element={<About />} />
               <Route path="/support-us" element={<SupportUs />} />
               <Route path="/support-us/:id" element={<SupportUs />} />
+              <Route path="/startups" element={<StartupsPage />} />
+              <Route path="/startups/:id" element={<StartupDetails />} />
               
               {/* Founder routes */}
               <Route 
