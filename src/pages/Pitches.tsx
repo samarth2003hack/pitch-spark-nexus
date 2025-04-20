@@ -1,7 +1,8 @@
-
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
+import { db } from '../firebase/config';
+import { ref, onValue } from 'firebase/database';
 import {
   Card,
   CardHeader,
@@ -21,45 +22,34 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-// Mock data for pitches (replace with real data later)
-const mockPitches = [
-  {
-    id: 1,
-    title: 'EcoTech Solutions',
-    description: 'Sustainable energy solutions for urban environments',
-    status: 'Under Review',
-    createdAt: '2024-04-15',
-    popularity: 85
-  },
-  {
-    id: 2,
-    title: 'HealthAI Assistant',
-    description: 'AI-powered personal health monitoring system',
-    status: 'Pending',
-    createdAt: '2024-04-16',
-    popularity: 92
-  },
-  {
-    id: 3,
-    title: 'SmartFarm',
-    description: 'IoT solutions for modern agriculture',
-    status: 'Under Review',
-    createdAt: '2024-04-17',
-    popularity: 78
-  },
-];
-
 const PitchesPage = () => {
   const navigate = useNavigate();
+  const [pitches, setPitches] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // Filter and sort pitches
-  const filteredPitches = mockPitches
-    .filter(pitch => {
-      const matchesSearch = pitch.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          pitch.description.toLowerCase().includes(searchQuery.toLowerCase());
+  useEffect(() => {
+    const pitchesRef = ref(db, 'pitches');
+    onValue(pitchesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const loadedPitches = Object.entries(data).map(([id, pitch]: any) => ({
+          id,
+          ...pitch,
+        }));
+        setPitches(loadedPitches);
+      } else {
+        setPitches([]);
+      }
+    });
+  }, []);
+
+  const filteredPitches = pitches
+    .filter((pitch) => {
+      const matchesSearch =
+        pitch.startupName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        pitch.description?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === 'all' ? true : pitch.status === statusFilter;
       return matchesSearch && matchesStatus;
     })
@@ -67,13 +57,12 @@ const PitchesPage = () => {
       if (sortBy === 'newest') {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
-      return b.popularity - a.popularity;
+      return (b.popularity || 0) - (a.popularity || 0);
     });
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="flex flex-col space-y-8">
-        {/* Header Section */}
         <div className="flex flex-col space-y-4">
           <h1 className="text-4xl font-bold tracking-tight">Explore Pitches</h1>
           <p className="text-muted-foreground">
@@ -81,7 +70,6 @@ const PitchesPage = () => {
           </p>
         </div>
 
-        {/* Search and Filter Section */}
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -119,26 +107,22 @@ const PitchesPage = () => {
           </div>
         </div>
 
-        {/* Pitch Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPitches.map((pitch) => (
             <Card key={pitch.id} className="flex flex-col hover:shadow-lg transition-shadow duration-200">
               <CardHeader>
-                <CardTitle>{pitch.title}</CardTitle>
+                <CardTitle>{pitch.startupName}</CardTitle>
                 <CardDescription>{pitch.description}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center">
                   <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                    {pitch.status}
+                    {pitch.status || 'Under Review'}
                   </span>
                 </div>
               </CardContent>
               <CardFooter className="mt-auto">
-                <Button 
-                  onClick={() => navigate(`/pitch/${pitch.id}`)}
-                  className="w-full"
-                >
+                <Button onClick={() => navigate(`/pitch/${pitch.id}`)} className="w-full">
                   View Details
                 </Button>
               </CardFooter>

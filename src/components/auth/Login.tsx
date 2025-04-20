@@ -1,29 +1,25 @@
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { useState } from "react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { toast } from "@/hooks/use-toast";
 import { Navbar } from "@/components/Navbar";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth, db } from "../firebase/config";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
+// 🔽 Firebase auth
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth } from "@/firebase/config"; // 🔁 update path as per your project
 
-const Signup: React.FC = () => {
+const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("founder");
-  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,73 +27,60 @@ const Signup: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      await signInWithEmailAndPassword(auth, email, password);
 
-      if (auth.currentUser) {
-        await updateProfile(auth.currentUser, {
-          displayName: name,
-        });
+      // Optional: store auth state locally if "remember me" is checked
+      if (rememberMe) {
+        localStorage.setItem("rememberMe", "true");
       }
 
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        name,
-        email,
-        role,
-        createdAt: serverTimestamp(),
-      });
+      // Determine role and redirect accordingly
+      let role = "founder"; // default
+      if (email.includes("mentor")) role = "mentor";
 
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userRole", role);
 
       toast({
-        title: "Account created successfully",
-        description: "Welcome to LaunchPad!",
+        title: "Login successful",
+        description: `Welcome back, ${role}!`,
       });
 
-      navigate(role === "founder" ? "/founder-dashboard" : "/mentor-dashboard");
+      navigate(role === "mentor" ? "/mentor-dashboard" : "/founder-dashboard");
     } catch (error: any) {
       toast({
-        title: "Signup failed",
-        description: error.message,
-        variant: "destructive",
+        title: "Login failed",
+        description: error.message || "Please check your credentials.",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleSignup = async () => {
+  const handleGoogleLogin = async () => {
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
+
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const defaultRole = "founder";
+      const email = result.user.email || "";
 
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        name: user.displayName || "",
-        email: user.email,
-        role: defaultRole,
-        createdAt: serverTimestamp(),
-      });
+      let role = "founder"; // Default for demo
+      if (email.includes("mentor")) role = "mentor";
 
       localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("userRole", defaultRole);
+      localStorage.setItem("userRole", role);
 
       toast({
-        title: "Signed in with Google",
-        description: `Welcome, ${user.displayName || "User"}!`,
+        title: "Google login successful",
+        description: "Welcome to LaunchPad!",
       });
 
-      navigate(defaultRole === "founder" ? "/founder-dashboard" : "/mentor-dashboard");
+      navigate(role === "mentor" ? "/mentor-dashboard" : "/founder-dashboard");
     } catch (error: any) {
       toast({
-        title: "Google signup failed",
-        description: error.message,
-        variant: "destructive",
+        title: "Login failed",
+        description: error.message || "Google login failed.",
       });
     } finally {
       setIsLoading(false);
@@ -108,24 +91,11 @@ const Signup: React.FC = () => {
     <>
       <Navbar />
       <AuthLayout
-        title="Create an account"
-        subtitle="Join LaunchPad to connect with mentors and founders"
-        authType="signup"
+        title="Welcome back"
+        subtitle="Enter your credentials to access your account"
+        authType="login"
       >
         <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="John Doe"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="h-12"
-            />
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -140,7 +110,15 @@ const Signup: React.FC = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="password">Password</Label>
+              <Link
+                to="/forgot-password"
+                className="text-sm text-launchpad-blue hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <div className="relative">
               <Input
                 id="password"
@@ -159,55 +137,26 @@ const Signup: React.FC = () => {
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Must be at least 8 characters, including a number and a special character.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label>I am a</Label>
-            <RadioGroup value={role} onValueChange={setRole} className="flex space-x-4">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="founder" id="founder" />
-                <Label htmlFor="founder" className="cursor-pointer">
-                  Startup Founder
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="mentor" id="mentor" />
-                <Label htmlFor="mentor" className="cursor-pointer">
-                  Mentor
-                </Label>
-              </div>
-            </RadioGroup>
           </div>
 
           <div className="flex items-center space-x-2">
             <Checkbox
-              id="terms"
-              checked={agreeTerms}
-              onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
-              required
+              id="remember"
+              checked={rememberMe}
+              onCheckedChange={(checked) => setRememberMe(checked as boolean)}
             />
             <label
-              htmlFor="terms"
+              htmlFor="remember"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              I agree to the{" "}
-              <Link to="/terms" className="text-launchpad-blue hover:underline">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link to="/privacy" className="text-launchpad-blue hover:underline">
-                Privacy Policy
-              </Link>
+              Remember me
             </label>
           </div>
 
           <Button
             type="submit"
             className="w-full h-12 bg-launchpad-blue hover:bg-launchpad-blue-dark"
-            disabled={isLoading || !agreeTerms}
+            disabled={isLoading}
           >
             {isLoading ? (
               <span className="flex items-center justify-center">
@@ -231,11 +180,11 @@ const Signup: React.FC = () => {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                Creating account...
+                Logging in...
               </span>
             ) : (
               <span className="flex items-center justify-center">
-                Create Account <ArrowRight className="ml-2 h-5 w-5" />
+                Login <ArrowRight className="ml-2 h-5 w-5" />
               </span>
             )}
           </Button>
@@ -245,7 +194,7 @@ const Signup: React.FC = () => {
               <span className="w-full border-t border-gray-300"></span>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or sign up with</span>
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
             </div>
           </div>
 
@@ -253,7 +202,7 @@ const Signup: React.FC = () => {
             type="button"
             variant="outline"
             className="w-full h-12 flex items-center justify-center"
-            onClick={handleGoogleSignup}
+            onClick={handleGoogleLogin}
             disabled={isLoading}
           >
             <GoogleIcon className="mr-2 h-5 w-5" />
@@ -261,9 +210,9 @@ const Signup: React.FC = () => {
           </Button>
 
           <p className="text-center text-sm text-gray-600 mt-6">
-            Already have an account?{" "}
-            <Link to="/login" className="text-launchpad-blue hover:underline font-medium">
-              Log in
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-launchpad-blue hover:underline font-medium">
+              Sign up
             </Link>
           </p>
         </form>
@@ -272,4 +221,4 @@ const Signup: React.FC = () => {
   );
 };
 
-export default Signup;
+export default Login;

@@ -2,10 +2,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import Index from "./pages/Index";
-import Login from "./pages/Login";
+import Login from "./components/auth/Login";
 import Signup from "./pages/Signup";
 import FounderDashboard from "./pages/FounderDashboard";
 import MentorDashboard from "./pages/MentorDashboard";
@@ -28,37 +28,18 @@ const queryClient = new QueryClient();
 const isAuthenticated = () => localStorage.getItem("isAuthenticated") === "true";
 const getUserRole = () => localStorage.getItem("userRole") || "";
 
-// Protected route components
-const FounderRoute = ({ children }: { children: React.ReactNode }) => {
+// Protected route handler
+const ProtectedRoute = ({ allowedRoles }: { allowedRoles?: string[] }) => {
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
-  
-  if (getUserRole() !== "founder") {
-    return <Navigate to="/mentor-dashboard" replace />;
-  }
-  
-  return <>{children}</>;
-};
 
-const MentorRoute = ({ children }: { children: React.ReactNode }) => {
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
+  const role = getUserRole();
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return <Navigate to={`/${role}-dashboard`} replace />;
   }
-  
-  if (getUserRole() !== "mentor") {
-    return <Navigate to="/founder-dashboard" replace />;
-  }
-  
-  return <>{children}</>;
-};
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  return <>{children}</>;
+  return <Outlet />;
 };
 
 const App = () => (
@@ -68,8 +49,6 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <div className="min-h-screen flex flex-col">
-   
-              
           <main className="flex-grow">
             <Routes>
               {/* Public routes */}
@@ -83,81 +62,34 @@ const App = () => (
               <Route path="/support-us/:id" element={<SupportUs />} />
               <Route path="/startups" element={<StartupsPage />} />
               <Route path="/startups/:id" element={<StartupDetails />} />
-              
-              {/* Founder routes */}
-              <Route 
-                path="/founder-dashboard" 
-                element={
-                  <FounderRoute>
-                    <FounderDashboard />
-                  </FounderRoute>
-                } 
-              />
-              <Route 
-                path="/founder-dashboard/create-pitch" 
-                element={
-                  <FounderRoute>
-                    <CreatePitch />
-                  </FounderRoute>
-                } 
-              />
-              <Route 
-                path="/your-startup" 
-                element={
-                  <FounderRoute>
-                    <YourStartup />
-                  </FounderRoute>
-                } 
-              />
-              <Route 
-                path="/new-pitch" 
-                element={
-                  <FounderRoute>
-                    <NewPitch />
-                  </FounderRoute>
-                } 
-              />
-              <Route 
-                path="/founder-profile" 
-                element={
-                  <FounderRoute>
-                    <FounderProfile />
-                  </FounderRoute>
-                } 
-              />
-              
-              {/* Mentor routes */}
-              <Route 
-                path="/mentor-dashboard" 
-                element={
-                  <MentorRoute>
-                    <MentorDashboard />
-                  </MentorRoute>
-                } 
-              />
-              <Route 
-                path="/mentor-profile" 
-                element={
-                  <MentorRoute>
-                    <MentorProfile />
-                  </MentorRoute>
-                } 
-              />
-              
-              {/* Auth redirects */}
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    {getUserRole() === "founder" ? (
-                      <Navigate to="/founder-dashboard" replace />
-                    ) : (
-                      <Navigate to="/mentor-dashboard" replace />
-                    )}
-                  </ProtectedRoute>
-                } 
-              />
-              
+
+              {/* Founder protected routes */}
+              <Route element={<ProtectedRoute allowedRoles={["founder"]} />}>
+                <Route path="/founder-dashboard" element={<FounderDashboard />} />
+                <Route path="/founder-dashboard/create-pitch" element={<CreatePitch />} />
+                <Route path="/your-startup" element={<YourStartup />} />
+                <Route path="/new-pitch" element={<NewPitch />} />
+                <Route path="/founder-profile" element={<FounderProfile />} />
+              </Route>
+
+              {/* Mentor protected routes */}
+              <Route element={<ProtectedRoute allowedRoles={["mentor"]} />}>
+                <Route path="/mentor-dashboard" element={<MentorDashboard />} />
+                <Route path="/mentor-profile" element={<MentorProfile />} />
+              </Route>
+
+              {/* Auth-only redirect route */}
+              <Route element={<ProtectedRoute />}>
+                <Route
+                  path="/dashboard"
+                  element={
+                    getUserRole() === "founder"
+                      ? <Navigate to="/founder-dashboard" replace />
+                      : <Navigate to="/mentor-dashboard" replace />
+                  }
+                />
+              </Route>
+
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
             </Routes>

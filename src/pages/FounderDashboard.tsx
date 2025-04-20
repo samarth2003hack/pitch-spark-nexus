@@ -1,4 +1,6 @@
-
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db, auth } from "../firebase/config";  // Ensure the correct imports
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,13 +59,36 @@ const RecentActivity = () => {
 };
 
 const FounderDashboard = () => {
+  const [userData, setUserData] = useState<any>(null);  // State to store user data
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (auth.currentUser) {
+        const userRef = doc(db, "users", auth.currentUser.uid);  // Reference to Firestore document
+        const docSnap = await getDoc(userRef);
+
+        if (docSnap.exists()) {
+          setUserData(docSnap.data());  // Set user data from Firestore
+        } else {
+          console.log("No such user!");
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  if (!userData) {
+    return <div>Loading...</div>;  // Show loading while fetching data
+  }
+
   return (
     <DashboardLayout userRole="founder">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Welcome card */}
         <Card className="lg:col-span-2 animate-fade-in shadow-sm">
           <CardHeader>
-            <CardTitle>Welcome Back, Sarah</CardTitle>
+            <CardTitle>Welcome Back, {userData.name}</CardTitle>
             <CardDescription>
               Here's what's happening with your pitches today
             </CardDescription>
@@ -177,53 +202,7 @@ const FounderDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="bg-launchpad-blue/5 p-4 rounded-lg border border-launchpad-blue/10">
-                <div className="flex justify-between items-start mb-2">
-                  <p className="font-medium">Pitch Review Session</p>
-                  <span className="text-xs text-launchpad-blue bg-launchpad-blue/10 px-2 py-1 rounded-full">
-                    Tomorrow
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600 mb-2">
-                  With <span className="font-medium">Michael Chen</span>
-                </p>
-                <p className="text-xs text-gray-500">Apr 19, 2025 • 10:00 AM</p>
-                <div className="mt-3 flex space-x-2">
-                  <Button size="sm" variant="outline" className="text-xs">
-                    Reschedule
-                  </Button>
-                  <Button size="sm" className="text-xs bg-launchpad-blue">
-                    Join
-                  </Button>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div className="flex justify-between items-start mb-2">
-                  <p className="font-medium">Feedback Discussion</p>
-                  <span className="text-xs text-gray-600 bg-gray-200 px-2 py-1 rounded-full">
-                    Next Week
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600 mb-2">
-                  With <span className="font-medium">Jane Doe</span>
-                </p>
-                <p className="text-xs text-gray-500">Apr 24, 2025 • 2:00 PM</p>
-                <div className="mt-3 flex space-x-2">
-                  <Button size="sm" variant="outline" className="text-xs">
-                    Reschedule
-                  </Button>
-                  <Button size="sm" variant="outline" className="text-xs">
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-
-              <Link to="/founder-dashboard/schedule">
-                <Button variant="ghost" size="sm" className="w-full text-launchpad-blue">
-                  View All Scheduled Sessions
-                </Button>
-              </Link>
+              {/* Session details */}
             </div>
           </CardContent>
         </Card>

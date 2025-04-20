@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { Navbar } from "@/components/Navbar";
 
 // Mock data - in a real app, this would come from your backend
 const mockStartupDetails = {
@@ -34,9 +35,9 @@ export default function StartupDetails() {
 
 
     <>
-    
-    <Navbar>
-    </Navbar>
+    <Navbar></Navbar>
+  
+      
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <Card className="mb-8">
